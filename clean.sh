@@ -1,0 +1,6 @@
+#! /bin/sh
+echo cleaning...
+rm build/main.o
+rm build/main.gb
+rm build/map.txt
+echo done...
