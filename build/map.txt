@@ -4,24 +4,24 @@ ROM Bank #0 (HOME):
   SECTION: $0050-$0050 ($0001 bytes)
   SECTION: $0058-$0058 ($0001 bytes)
   SECTION: $0060-$0060 ($0001 bytes)
-  SECTION: $0100-$0A41 ($0942 bytes)
-           $09CF = begin
-           $0150 = HexDigits
-           $0192 = waitForVblank
-           $0160 = printHex4
-           $0A31 = StopLCD
-           $01CD = TileData
-           $0A1B = UserName
-           $0A31 = UserNameEnd
-           $019B = readPad
-           $0171 = printHex
+  SECTION: $0100-$0A52 ($0953 bytes)
+           $09E0 = begin
+           $0161 = HexDigits
+           $01A3 = waitForVblank
+           $0171 = printHex4
+           $0A42 = StopLCD
+           $01DE = TileData
+           $0A2C = UserName
+           $0A42 = UserNameEnd
+           $01AC = readPad
+           $0182 = printHex
   SECTION: $0061-$00B6 ($0056 bytes)
            $007B = mem_CopyMono
            $008B = mem_SetVRAM
            $00A1 = mem_CopyVRAM
            $0061 = mem_Set
            $006D = mem_Copy
-    SLACK: $3663 bytes
+    SLACK: $3652 bytes
 
 WRAM Bank #0:
   SECTION: $C000-$BFFF ($0000 bytes)

@@ -1,0 +1,18 @@
+; Collection of advanced arithmetic procedures
+
+; ****
+; Calculates the product of DE and A and stores it into HL
+; ****
+DE_Times_A:          	; HL = DE × A
+    LD     	HL, 0      	; Use HL to store the product
+    LD     	B, 8       	; Eight bits to check
+_loop:
+    RRCA             	; Check least-significant bit of accumulator
+    JR     	NC, _skip  	; If zero, skip addition
+    ADD    	HL, DE
+_skip:
+    SLA    	E         	; Shift DE one bit left
+    RL	D
+    DEC	B
+    JR	NZ,_loop
+    RET

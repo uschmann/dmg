@@ -31,6 +31,7 @@ jp	begin
 ; ROM header
 	ROM_HEADER	ROM_NOMBC, ROM_SIZE_32KBYTE, RAM_SIZE_0KBYTE
 INCLUDE "include/memory.z80"
+INCLUDE "include/math.z80"
 INCLUDE "include/printFunctions.z80"
 INCLUDE "include/pad.z80"
 TileData:
