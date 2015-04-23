@@ -130,3 +130,4 @@ StopLCD:
 ; RAM
 SECTION	"variables", BSS
 _PAD:
+	DS	$01	; allocate 1 byte for the state of the pad
