@@ -1,2 +1,4 @@
-build/
+build/*.gb
+build/*.txt
+build/*.o
 
