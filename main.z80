@@ -78,6 +78,8 @@ init:
 	call	startGame
 
 
-SECTION	"variables", BSS
-_PAD:
-	DS	$01	; allocate 1 byte for the state of the pad
+SECTION	"global", BSS
+_PAD:			; allocate 1 byte for the state of the pad
+	DS	$01	
+_LIFES:		; Number of lifes left
+	DS	$01	

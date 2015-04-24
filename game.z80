@@ -1,3 +1,11 @@
+; defines
+DEFAULT_LIFES 	EQU  $3 ; The number of lifes when the game start
+
+; constant data
+TXT_LIFES
+	DB	"LIFES:"
+TXT_LIFES_END
+
 ; **
 ; Starts a new game
 ; **
@@ -9,6 +17,8 @@ startGame:
 ; Initialises the game
 ; **
 .init:
+	ld	a,DEFAULT_LIFES
+	ld	[_LIFES],a
 	ret
 
 ; **
@@ -17,6 +27,7 @@ startGame:
 .gameLoop:
 	call 	.readInput		; read Input
 	call	.gameLogic		; game logic is here
+	call	.drawView		; draw the game screen
 	jr	.gameLoop
 
 ; **
@@ -24,10 +35,6 @@ startGame:
 ; **
 .readInput:
 	call	readPad			; read the status of the buttons
-	ld	a,[_PAD]			; write status of buttons to c
-	ld	c,a				;
-	ld	d,0				; x position to display hex representation of button state
-	call	printHex
 	ret
 
 ; **
@@ -39,5 +46,19 @@ startGame:
 ; **
 ; Updates the screen according to the model data and game state
 ; **
-.updateView:
+.drawView:
+	call	.drawNumberOfLifes
+	ret
+
+.drawNumberOfLifes
+	ld	hl, TXT_LIFES			; Display lifes-label
+	ld	de, _SCRN0
+	ld	bc, TXT_LIFES_END - TXT_LIFES
+	call	mem_CopyVRAM
+
+	ld	a,[_LIFES]				; Draw lifes
+	ld	c,a				
+	ld	d,TXT_LIFES_END - TXT_LIFES 			
+	call	printHex
+
 	ret
