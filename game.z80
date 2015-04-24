@@ -1,0 +1,43 @@
+; **
+; Starts a new game
+; **
+startGame:
+	call	.init
+	jp	.gameLoop
+
+; **
+; Initialises the game
+; **
+.init:
+	ret
+
+; **
+; The main game loop
+; **
+.gameLoop:
+	call 	.readInput		; read Input
+	call	.gameLogic		; game logic is here
+	jr	.gameLoop
+
+; **
+; Reads user input from the keypad and stores the state of the buttons in _PAD
+; **
+.readInput:
+	call	readPad			; read the status of the buttons
+	ld	a,[_PAD]			; write status of buttons to c
+	ld	c,a				;
+	ld	d,0				; x position to display hex representation of button state
+	call	printHex
+	ret
+
+; **
+; Updates model value and sets the state of the game
+; **
+.gameLogic:
+	ret
+
+; **
+; Updates the screen according to the model data and game state
+; **
+.updateView:
+	ret

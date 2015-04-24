@@ -2,9 +2,44 @@
 HexDigits:
 	DB	$30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $41, $42, $43, $44, $45, $46
 
+; **
+; Sets the OAM memory to 0
+; **
+clearOamMemory:
+	push	af					; save register
+	push	bc
+	push	hl
+
+	ld	a, 0					; Fill OAM memory with 0
+	ld	hl, _OAMRAM
+	ld	bc, $00A0
+	call	mem_SetVRAM
+
+	pop	hl					; restore register
+	pop	bc
+	pop	af
+	ret
+
+clearScreen:
+	push	af					; save register
+	push	hl
+	push	bc
+
+	ld	a, 32					; Clear screen
+	ld	hl, _SCRN0
+	ld	bc, SCRN_VX_B * SCRN_VY_B
+	call	mem_SetVRAM
+
+	pop	bc					; restore register
+	pop	hl
+	pop	af
+	ret
+
+; **
 ; Prints the lower 4 bit of c in ASCII at position x
 ; c = number
 ; d = x
+; **
 printHex4:
 	push	de			; Save register pair de
 
@@ -24,9 +59,11 @@ printHex4:
 	pop de			; restore register pair de
 	ret
 
+; **
 ; Print value of c as HEX string
 ; c = number
 ; d = x
+; **
 printHex:
 	call	waitForVblank
 	push 	bc
@@ -55,8 +92,9 @@ printHex:
 	pop	bc
 
 	ret
-
+; **
 ; Waits for VBlank and returns
+; **
 waitForVblank:
 	push	af
 .wait:				; wait for vblank
@@ -65,3 +103,23 @@ waitForVblank:
  	jr	nz,.wait        	; no, keep waiting
  	pop	af
  	ret
+
+; **
+; Deacivates the LCD screen
+; Usefull if we try to set VRAM $8000
+; **
+stopLCD:
+      ld      a,[rLCDC]
+      rlca                    ; Put the high bit of LCDC into the Carry flag
+      ret     nc              ; Screen is off already. Exit.
+
+.wait:				; Loop until we are in VBlank
+      ld      a,[rLY]
+      cp      145             ; Is display on scan line 145 yet?
+      jr      nz,.wait        ; no, keep waiting
+
+      ld      a,[rLCDC]		; Turn off the LCD
+      res     7,a             ; Reset bit 7 of LCDC
+      ld      [rLCDC],a
+
+      ret

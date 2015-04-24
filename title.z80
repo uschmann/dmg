@@ -1,0 +1,22 @@
+; **
+; Title screen
+; **
+
+showTitleScreen:
+	ld	hl, TITLE_STRING										; Display TITLE_String
+	ld	de, _SCRN0 + (TITLE_STRING_END-TITLE_STRING)/2+1 + (SCRN_VY_B*7)		; Center the string
+	ld	bc, TITLE_STRING_END - TITLE_STRING
+	call	mem_CopyVRAM
+
+.waitForKeyPress:
+	call 	readPad
+	ld	a, [_PAD]
+	or	a
+	jr	z, .waitForKeyPress
+
+	call	clearScreen
+	ret
+
+TITLE_STRING:
+	DB	"MONOSTACK"
+TITLE_STRING_END:
