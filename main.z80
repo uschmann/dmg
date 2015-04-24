@@ -83,3 +83,11 @@ _PAD:			; allocate 1 byte for the state of the pad
 	DS	$01	
 _LIFES:		; Number of lifes left
 	DS	$01	
+_BLOCKS:
+	DS	$01	; Number of blocks
+_X:	
+	DS	$01	; Current x position
+_Y:
+	DS	$01	; Current y poition
+_DIRECTION:
+	DS	$01	; Current direction 0 = left 1 = right

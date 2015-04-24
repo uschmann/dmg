@@ -1,5 +1,12 @@
 ; defines
-DEFAULT_LIFES 	EQU  $3 ; The number of lifes when the game start
+DEFAULT_LIFES 	EQU	3 ; The number of lifes when the game start
+DEFAULT_X		EQU	0 ; The start position for _X
+DEFAULT_Y		EQU	5 ; The start address for _Y
+DEFAULT_BLOCKS	EQU	5 ; Number of blocks to start with
+DIR_LEFT		EQU	0 ; 
+DIR_RIGHT		EQU	1 ; 
+
+BOARD_WIDTH		EQU	20 ; Width of the game field
 
 ; constant data
 TXT_LIFES
@@ -10,47 +17,144 @@ TXT_LIFES_END
 ; Starts a new game
 ; **
 startGame:
-	call	.init
-	jp	.gameLoop
+	call	initGame
+	jp	gameLoop
 
 ; **
 ; Initialises the game
 ; **
-.init:
-	ld	a,DEFAULT_LIFES
+initGame:
+	ld	a,DEFAULT_LIFES	; set number of lifes
 	ld	[_LIFES],a
+
+	ld	a,DEFAULT_X		; set the start x position
+	ld	[_X],a
+
+	ld	a,DEFAULT_Y		; set the start y position
+	ld	[_Y],a		
+
+	ld	a,DIR_RIGHT		; Set the moving direction
+	ld	[_DIRECTION],a
+
+	ld	a,DEFAULT_BLOCKS	; Set the number of blocks
+	ld	[_BLOCKS],a
 	ret
 
 ; **
 ; The main game loop
 ; **
-.gameLoop:
-	call 	.readInput		; read Input
-	call	.gameLogic		; game logic is here
-	call	.drawView		; draw the game screen
-	jr	.gameLoop
+gameLoop:
+	call 	readInput		; read Input
+	call	gameLogic		; game logic is here
+	call	drawView		; draw the game screen
+	jr	gameLoop
 
 ; **
 ; Reads user input from the keypad and stores the state of the buttons in _PAD
 ; **
-.readInput:
-	call	readPad			; read the status of the buttons
+readInput:
+	call	readPad		; read the status of the buttons
 	ret
 
 ; **
 ; Updates model value and sets the state of the game
 ; **
-.gameLogic:
+gameLogic:
+	call	checkCollision
+	call	moveBlocks
+	ret
+
+; **
+; Checks if collision with boarders of gamefiles acoured and flips the moving direction accordingly
+; **
+checkCollision:
+	ld	a,[_DIRECTION]
+	cp	DIR_RIGHT
+	jr	z,.checkCollisionRight
+.checkCollisionLeft:
+	ld	a,[_X]		; Set direction to right if _X == 0
+	cp	0
+	ret	nz
+	ld	a,DIR_RIGHT
+	ld	[_DIRECTION],a
+	ret
+.checkCollisionRight:
+	ld	a,[_BLOCKS]		; store number of _BLOCKS in b	(DUMMY: 1)
+	ld	b,a
+	ld	a,[_X]
+	add	b			; add _BLOCKS to _X
+	cp	BOARD_WIDTH		; Set direction to left if _BLOCKS + _X == BOARD_WIDTH
+	ret	nz
+	ld	a,DIR_LEFT
+	ld	[_DIRECTION],a
+	ret
+
+; **
+; Moves the blocks accordingly to the direction
+; **
+moveBlocks:
+	ld	a,[_DIRECTION]
+	cp	DIR_RIGHT
+	jr	z,.moveRight
+.moveLeft:
+	ld	a,[_X]
+	dec	a
+	ld	[_X],a
+	ret
+.moveRight:
+	ld	a,[_X]
+	inc	a
+	ld	[_X],a
 	ret
 
 ; **
 ; Updates the screen according to the model data and game state
 ; **
-.drawView:
-	call	.drawNumberOfLifes
+drawView:
+	call	drawNumberOfLifes
+	call	drawBlocks
 	ret
 
-.drawNumberOfLifes
+; **
+; Draws the active blocks
+; **
+drawBlocks:
+	call	waitForVblank	
+	ld	a,[_Y]		; Clear line to redraw blocks
+	ld	d,0
+	ld	e,SCRN_VX_B
+	call	DE_Times_A		; _Y * Screen width
+	ld	de,_SCRN0
+	add	hl,de
+
+	ld	b,SCRN_VX_B
+.clearLine:				
+	ld	[hl],32
+	inc	hl
+	dec	b
+	jr	nz,.clearLine
+
+	ld	a,[_Y]		; calculate start Address
+	ld	d,0
+	ld	e,SCRN_VX_B
+	call	DE_Times_A		; _Y * Screen width
+	ld	de,_SCRN0
+	add	hl,de
+
+	ld	a,[_X]		; Add x
+	ld	d,0
+	ld	e,a
+	add	hl,de
+
+	ld	a,[_BLOCKS]
+.drawBlock:
+	ld	[hl],1
+	inc	hl
+	dec	a
+	jr	nz,.drawBlock
+	ret
+
+drawNumberOfLifes:
 	ld	hl, TXT_LIFES			; Display lifes-label
 	ld	de, _SCRN0
 	ld	bc, TXT_LIFES_END - TXT_LIFES
