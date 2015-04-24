@@ -58,20 +58,39 @@ init:
 	ld	de, _VRAM		; $8000
 	ld	bc, 8*256 		; the ASCII character set: 256 characters, each with 8 bytes of display data
 	call	mem_CopyMono	; load tile data
-	ld	a, LCDCF_ON|LCDCF_BG8000|LCDCF_BG9800|LCDCF_BGON|LCDCF_OBJ16|LCDCF_OBJOFF 
-	ld	[rLCDC], a	
+	
+	
 	ld	a, 32			; Clear screen
 	ld	hl, _SCRN0
 	ld	bc, SCRN_VX_B * SCRN_VY_B
 	call	mem_SetVRAM
+
+	; clear OAM memory
+	ld	a, 0
+	ld	hl, _OAMRAM
+	ld	bc, $00A0
+	call	mem_SetVRAM
+
+	; Set spreite 1 to the middle of the screen
+	ld	a,SCRN_X/2+8	; X-Position
+	ld	[_OAMRAM],a		
+	ld	a,SCRN_Y/2+8	; Y-Position
+	ld	[_OAMRAM+1],a
+	ld	a,1			; Char index (1 = Happy face)
+	ld	[_OAMRAM+2],a
+
+	; turn on LCD
+	ld	a, LCDCF_ON|LCDCF_BG8000|LCDCF_BG9800|LCDCF_BGON|LCDCF_OBJ8|LCDCF_OBJON
+	ld	[rLCDC], a	
+
 ; ****************************************************************************************
 ; Main code:
 ; Print a character string in the middle of the screen
 ; ****************************************************************************************
-	ld	hl,UserName
-	ld	de, _SCRN0+(SCRN_VY_B*7) ;
-	ld	bc, UserNameEnd-UserName
-	call	mem_CopyVRAM
+;	ld	hl,UserName
+;	ld	de, _SCRN0+(SCRN_VY_B*7) ;
+;	ld	bc, UserNameEnd-UserName
+;	call	mem_CopyVRAM
 
 ; ****************************************************************************************
 ; Read the button state and print it in Hex
