@@ -16,6 +16,14 @@ TXT_LIFES
 	DB	"LIFES:"
 TXT_LIFES_END
 
+TXT_LEVEL
+	DB	"LEVEL:"
+TXT_LEVEL_END
+
+TXT_SCORE
+	DB	"SCORE:"
+TXT_SCORE_END
+
 ; **
 ; Starts a new game
 ; **
@@ -67,10 +75,8 @@ readInput:
 ; Updates model value and sets the state of the game
 ; **
 gameLogic:
-	ld	a,[_PAD_DOWN]		; if(_PAD != 0) setBlocks()
-	ld	b,KEY_A
-	and	b
-	cp	0
+	ld	a,[_PAD_DOWN]		; set blocks if user pressed A
+	and	KEY_A
 	call	nz,setBlocks
 
 	call	checkCollision
@@ -126,7 +132,7 @@ setBlocks:
 	dec	a				; go to next line
 	ld	[_Y],a
 
-	ld	a,0
+	ld	a,0				; reset _X to 0
 	ld	[_X+1],a
 	ret
 .failedToSetBlocks:			; Failed to place the blogs.

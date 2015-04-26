@@ -60,7 +60,7 @@ readPad:
     ld      a,$30
     ld      [rP1], a
 
-    ld  a,[_PAD_OLD]
+    ld  a,[_PAD_OLD]        ; Store newly pressed buttons in _PAD_DOWN
     ld  b,a
 
     ld  a,[_PAD]

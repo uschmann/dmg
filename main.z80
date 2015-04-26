@@ -1,10 +1,6 @@
-; Hello World 1.0
-; February 2, 2007
-; John Harrison
-; Based mostly from GALP
-
 INCLUDE "include/gbhw.z80" ; standard hardware definitions from devrs.com
-INCLUDE "include/ibmpc1.z80" ; ASCII character set from devrs.com
+
+
 
 ; IRQs
 SECTION	"Vblank",HOME[$0040]
@@ -31,6 +27,7 @@ jp	begin
 ; ROM header
 	ROM_HEADER	ROM_NOMBC, ROM_SIZE_32KBYTE, RAM_SIZE_0KBYTE
 ; librarys
+INCLUDE "include/ibmpc1.z80" ; ASCII character set from devrs.com
 INCLUDE "include/memory.z80"
 INCLUDE "include/math.z80"
 INCLUDE "include/printFunctions.z80"
@@ -86,10 +83,11 @@ init:
 SECTION	"global", BSS
 _PAD:			; allocate 1 byte for the state of the pad
 	DS	$01	
-_PAD_OLD:		; newly pressed buttons
+_PAD_OLD:		
 	DS	$01	
-_PAD_DOWN:
+_PAD_DOWN:		; newly pressed buttons
 	DS	$01
+; -- Gamespecific variables
 _LIFES:		; Number of lifes left
 	DS	$01	
 _BLOCKS:
