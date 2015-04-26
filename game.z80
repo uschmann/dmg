@@ -72,22 +72,85 @@ gameLogic:
 ; **
 setBlocks:
 	ld	a,[_Y]
-	cp	DEFAULT_Y		; Check if we are at the bottom
+	cp	DEFAULT_Y			; Check if we are at the bottom. We can place the blocks everywhere
 	jr	nz,.notOnFirstLine
-	dec	a			; go to next line
+	dec	a			
 	ld	[_Y],a
 	ret
-.notOnFirstLine:
+.notOnFirstLine:				; Check if the blocks were set successfully
 	call	checkForFail
+	cp	0
+	jr	z,.failedToSetBlocks
+.successSetBlocks:			; Blocks were set successfully
+	ld	a,[_Y]
+	dec	a				; go to next line
+	ld	[_Y],a
 
+	ld	a,0
+	ld	[_X],a
+	ret
+.failedToSetBlocks:			; Failes to place the blogs.
+	ld	a,0				; reset x to 0
+	ld	[_X],a
+
+	ld	a,[_BLOCKS]			; Decrement the number of Blogs
+	dec	a
+	ld	[_BLOCKS],a
+
+	cp	0				; Check if blocks == 0
+	jr	z,.noMoreBlocks
+	ret
+.noMoreBlocks:
+	ld	a,[_LIFES]			; _LIFES--
+	dec	a
+	ld	[_LIFES],a
+
+	call	resetLevel
 	ret
 
 ; **
+; Restarts the current level
+; **
+resetLevel:
+	call	clearScreen
+	ld	a,DEFAULT_X		; set the start x position
+	ld	[_X],a
+
+	ld	a,DEFAULT_Y		; set the start y position
+	ld	[_Y],a		
+
+	ld	a,DIR_RIGHT		; Set the moving direction
+	ld	[_DIRECTION],a
+
+	ld	a,DEFAULT_BLOCKS	; Set the number of blocks
+	ld	[_BLOCKS],a
+	ret
+; **
 ; Check if the user failed at placing the blocks
-; OUTPUT: a ==1 if fail else a == 0
+; OUTPUT: a == 0 if fail else a == 1
 ; **
 checkForFail:
-	
+	call	waitForVblank
+	ld	a,[_BLOCKS]
+	ld	c,a
+.forEachBlock:			; Check to see if each block is stacked on another
+	ld	a,[_X]		
+	ld	b,a
+	ld	a,[_Y]
+	inc	a
+	call	coordsToAdress0
+	ld	a,[hl]
+
+	cp	1			; Check if there is a block
+	jr	nz,.failedToSet
+.successToSet:
+	inc	b
+	dec	c
+	jp	nz,.forEachBlock	; Check next blog
+	ld	a,1			; All blogs placed correct
+	ret
+.failedToSet:
+	ld	a,0
 	ret
 
 ; **
@@ -160,17 +223,10 @@ drawBlocks:
 	dec	b
 	jr	nz,.clearLine
 
-	ld	a,[_Y]		; calculate start Address -> _X + (_Y * screenWidth)
-	ld	d,0
-	ld	e,SCRN_VX_B
-	call	DE_Times_A		; _Y * Screen width
-	ld	de,_SCRN0
-	add	hl,de
-
-	ld	a,[_X]		; Add x
-	ld	d,0
-	ld	e,a
-	add	hl,de
+	ld	a,[_X]		; get Address of bgMap to draw
+	ld	b,a
+	ld	a,[_Y]
+	call	coordsToAdress0
 
 	ld	a,[_BLOCKS]
 .drawBlock:

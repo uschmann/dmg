@@ -9,10 +9,10 @@ HexDigits:
 ; Input:	a = y; b = x;
 ; Output:	hl = address
 ; **
-coordToAddress0:
+coordsToAdress0:
 	push	af
 	push	de
-	
+
 	ld	d,0
 	ld	e,SCRN_VX_B
 	call	DE_Times_A		; _Y * Screen width

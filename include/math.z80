@@ -4,6 +4,8 @@
 ; Calculates the product of DE and A and stores it into HL
 ; ****
 DE_Times_A:          	; HL = DE × A
+    push    bc
+    push    de
     LD     	HL, 0      	; Use HL to store the product
     LD     	B, 8       	; Eight bits to check
 ._loop:
@@ -15,6 +17,8 @@ DE_Times_A:          	; HL = DE × A
     RL	D
     DEC	B
     JR	NZ,._loop
+    pop de
+    pop bc
     RET
 
 ; ****
