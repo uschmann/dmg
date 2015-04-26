@@ -58,7 +58,7 @@ init:
 	ld	[_PAD_OLD],a
 
 	ld	a, %11100100 	; Window palette colors, from darkest to lightest
-	ld	[rBGP], a		; CLEAR THE SCREEN
+	ld	[rBGP], a		
 
 	ld	a,0			; SET SCREEN TO TO UPPER RIGHT HAND CORNER
 	ld	[rSCX], a
