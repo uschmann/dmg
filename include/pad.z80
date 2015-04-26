@@ -1,3 +1,13 @@
+;Key defines
+KEY_A       EQU $01
+KEY_B       EQU $02
+KEY_SELECT  EQU $04
+KEY_START   EQU $08
+KEY_RIGHT   EQU $10
+KEY_LEFT    EQU $20
+KEY_UP      EQU $40
+KEY_DOWN    EQU $08
+
 ;****
 ; Reads the status of the buttons and stores it in a variable at label _PAD
 ;****

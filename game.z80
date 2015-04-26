@@ -7,7 +7,8 @@ DEFAULT_BLOCKS	EQU	5	; Number of blocks to start with
 
 DIR_LEFT		EQU	0 	; Constant for left direction 
 DIR_RIGHT		EQU	1 	; Constant for right direction 
-BOARD_WIDTH		EQU	20 ; Width of the game field
+BOARD_WIDTH		EQU	20	; Width of the game field
+GOAL_Y		EQU	7	; The level is finished if y is == GOAL_Y
 
 ; constant data
 TXT_LIFES
@@ -68,8 +69,21 @@ gameLogic:
 	call	checkCollision
 	call	moveBlocks
 	ld	a,[_PAD_DOWN]		; if(_PAD != 0) setBlocks()
+	ld	b,KEY_A
+	and	b
 	cp	0
 	call	nz,setBlocks
+
+	call	checkGameOver
+	ret
+
+; **
+; Checks if the game is over (_LIFES == 0)
+; **
+checkGameOver:
+	ld	a,[_LIFES]		; For now we simply return to the title
+	cp	0
+	jp	z,begin
 	ret
 
 ; **
@@ -81,6 +95,9 @@ setBlocks:
 	jr	nz,.notOnFirstLine
 	dec	a			
 	ld	[_Y],a
+	ld	a,0				; reset x to 0
+	ld	[_X],a
+	ld	[_X+1],a
 	ret
 .notOnFirstLine:				; Check if the blocks were set successfully
 	call	checkForFail

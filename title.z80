@@ -11,7 +11,8 @@ showTitleScreen:
 .waitForKeyPress:
 	call 	readPad
 	ld	a, [_PAD]
-	or	a
+	ld	b,KEY_START
+	and	b
 	jr	z, .waitForKeyPress
 
 	call	clearScreen
