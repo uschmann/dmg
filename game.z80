@@ -8,7 +8,7 @@ DEFAULT_BLOCKS	EQU	5	; Number of blocks to start with
 DIR_LEFT		EQU	0 	; Constant for left direction 
 DIR_RIGHT		EQU	1 	; Constant for right direction 
 BOARD_WIDTH		EQU	20	; Width of the game field
-GOAL_Y		EQU	7	; The level is finished if y is == GOAL_Y
+GOAL_Y		EQU	4	; The level is finished if y is == GOAL_Y
 SPEED_INC		EQU	20	; The incresement of speed for each level
 
 ; constant data
@@ -116,7 +116,12 @@ checkWin:
 checkGameOver:
 	ld	a,[_LIFES]		; For now we simply return to the title
 	cp	0
-	jp	z,begin
+	ret	nz
+
+	ld	a,[_SCORE]
+	ld	[_HIGHSCORE],a
+	ld	sp, $ffff		; set the stack pointer to highest mem location + 1
+	jp	restart
 	ret
 
 ; **
@@ -164,6 +169,8 @@ setBlocks:
 	ld	a,[_LIFES]			; _LIFES--
 	dec	a
 	ld	[_LIFES],a
+	ld	a,DEFAULT_BLOCKS
+	ld	[_BLOCKS],a
 	call	resetLevel
 	ret
 
@@ -181,8 +188,6 @@ resetLevel:
 	ld	a,DIR_RIGHT		; Set the moving direction
 	ld	[_DIRECTION],a
 
-	ld	a,DEFAULT_BLOCKS	; Set the number of blocks
-	ld	[_BLOCKS],a
 	ret
 
 ; **

@@ -3,10 +3,22 @@
 ; **
 
 showTitleScreen:
-	ld	hl, TITLE_STRING										; Display TITLE_String
-	ld	de, _SCRN0 + (TITLE_STRING_END-TITLE_STRING)/2+1 + (SCRN_VY_B*7)		; Center the string
-	ld	bc, TITLE_STRING_END - TITLE_STRING
-	call	mem_CopyVRAM
+	call	waitForVblank
+	ld	a,7
+	ld	b,(TXT_TITLE_END - TXT_TITLE) / 2
+	ld	de,TXT_TITLE
+	call printText
+
+	ld	a,9
+	ld	b,(TXT_HIGHSCORE_END - TXT_HIGHSCORE) / 2 - 2
+	ld	de,TXT_HIGHSCORE
+	call printText
+
+	ld	a,[_HIGHSCORE]
+	ld	c,a
+	ld	a,9
+	ld	b,(TXT_HIGHSCORE_END - TXT_HIGHSCORE) / 2 + (TXT_HIGHSCORE_END - TXT_HIGHSCORE) - 2
+	call 	printHex
 
 .waitForKeyPress:
 	call 	readPad
@@ -16,8 +28,13 @@ showTitleScreen:
 	jr	z, .waitForKeyPress
 
 	call	clearScreen
+	call	clearOamMemory
 	ret
 
-TITLE_STRING:
-	DB	"MONOSTACK"
-TITLE_STRING_END:
+TXT_TITLE:
+	DB	"MONOSTACK",0
+TXT_TITLE_END:
+
+TXT_HIGHSCORE:
+	DB	"HIGHSCORE:",0
+TXT_HIGHSCORE_END

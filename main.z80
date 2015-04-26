@@ -53,6 +53,7 @@ init:
 	ld	[_PAD],a
 	ld	[_PAD_DOWN],a
 	ld	[_PAD_OLD],a
+	ld	[_HIGHSCORE],a
 
 	ld	a, %11100100 	; Window palette colors, from darkest to lightest
 	ld	[rBGP], a		
@@ -75,7 +76,7 @@ init:
 	ld	a, LCDCF_ON|LCDCF_BG8000|LCDCF_BG9800|LCDCF_BGON|LCDCF_OBJ8|LCDCF_OBJON
 	ld	[rLCDC], a	
 
-
+restart:
 	call	showTitleScreen
 	call	startGame
 
@@ -104,3 +105,5 @@ _SPEED:
 	DS	$01	; current speed of the blocks
 _DIRECTION:
 	DS	$01	; Current direction 0 = left 1 = right
+_HIGHSCORE:
+	DS	$01	; current highscore
