@@ -2,26 +2,26 @@
 DEFAULT_LIFES 	EQU	3	; The number of lifes when the game start
 DEFAULT_X		EQU	0	; The start position for _X
 DEFAULT_Y		EQU	17	; The start address for _Y
-DEFAULT_SPEED	EQU	40	; Default speed the of the blocks
-DEFAULT_BLOCKS	EQU	4	; Number of blocks to start with
+DEFAULT_SPEED	EQU	50	; Default speed the of the blocks
+DEFAULT_BLOCKS	EQU	5	; Number of blocks to start with
 
 DIR_LEFT		EQU	0 	; Constant for left direction 
 DIR_RIGHT		EQU	1 	; Constant for right direction 
-BOARD_WIDTH		EQU	15	; Width of the game field
-GOAL_Y		EQU	10	; The level is finished if y is == GOAL_Y
-SPEED_INC		EQU	40	; The incresement of speed for each level
+BOARD_WIDTH		EQU	20	; Width of the game field
+GOAL_Y		EQU	7	; The level is finished if y is == GOAL_Y
+SPEED_INC		EQU	20	; The incresement of speed for each level
 
 ; constant data
 TXT_LIFES
-	DB	"LIFES:"
+	DB	"LIFES:", 0
 TXT_LIFES_END
 
 TXT_LEVEL
-	DB	"LEVEL:"
+	DB	"LEVEL:", 0
 TXT_LEVEL_END
 
 TXT_SCORE
-	DB	"SCORE:"
+	DB	"SCORE:", 0
 TXT_SCORE_END
 
 ; **
@@ -37,6 +37,12 @@ startGame:
 initGame:
 	ld	a,DEFAULT_LIFES	; set number of lifes
 	ld	[_LIFES],a
+
+	ld	a,1			; set the current level
+	ld	[_LEVEL],a	
+
+	ld	a,0			; set the score
+	ld	[_SCORE],a	
 
 	ld	a,DEFAULT_X		; set the start x position
 	ld	[_X],a
@@ -97,6 +103,9 @@ checkWin:
 	ld	a,[_SPEED]		; increase speed
 	add	SPEED_INC
 	ld	[_SPEED],a
+	ld	a,[_LEVEL]		; increase _LEVEL
+	inc	a
+	ld	[_LEVEL],a
 	call	resetLevel
 	ret
 
@@ -198,7 +207,10 @@ checkForFail:
 	inc	b
 	dec	c
 	jp	nz,.forEachBlock	; Check next blog
-	ld	a,1			; All blogs placed correct
+	ld	a,[_SCORE]			; All blogs placed correct
+	inc	a
+	ld	[_SCORE],a
+	ld	a,1
 	ret
 .failedToSet:
 	ld	a,0
@@ -274,7 +286,7 @@ moveBlocks:
 ; Updates the screen according to the model data and game state
 ; **
 drawView:
-	call	drawNumberOfLifes
+	call	drawHud
 	call	drawBlocks
 	ret
 
@@ -310,15 +322,45 @@ drawBlocks:
 	jr	nz,.drawBlock
 	ret
 
-drawNumberOfLifes:
-	ld	hl, TXT_LIFES			; Display lifes-label
-	ld	de, _SCRN0
-	ld	bc, TXT_LIFES_END - TXT_LIFES
-	call	mem_CopyVRAM
+drawHud:
+	call	waitForVblank
+	ld	a,GOAL_Y
+	ld	c,$CD
+	call	fillRow
 
-	ld	a,[_LIFES]				; Draw lifes
-	ld	c,a				
-	ld	d,TXT_LIFES_END - TXT_LIFES 			
+	ld	b,0							; LIFES
+	ld	a,0
+	ld	de,TXT_LIFES
+	call	printText
+
+	ld	a,[_LIFES]	
+	ld	c,a
+	ld	a,0
+	ld	b,TXT_LIFES_END - TXT_LIFES - 1
+	call	printHex
+
+	call	waitForVblank
+	ld	b,12							; LEVEL
+	ld	a,0
+	ld	de,TXT_LEVEL
+	call	printText
+	
+	ld	a,[_LEVEL]	
+	ld	c,a
+	ld	a,0
+	ld	b,TXT_LEVEL_END - TXT_LEVEL + 11
+	call	printHex
+
+	call	waitForVblank
+	ld	b,12							; SCORE
+	ld	a,1
+	ld	de,TXT_SCORE
+	call	printText
+	
+	ld	a,[_SCORE]	
+	ld	c,a
+	ld	a,1
+	ld	b,TXT_SCORE_END - TXT_SCORE + 11
 	call	printHex
 
 	ret

@@ -88,8 +88,12 @@ _PAD_OLD:
 _PAD_DOWN:		; newly pressed buttons
 	DS	$01
 ; -- Gamespecific variables
-_LIFES:		; Number of lifes left
-	DS	$01	
+_LIFES:		
+	DS	$01	; Number of lifes left
+_SCORE:		
+	DS	$01	; current score
+_LEVEL:
+	DS	$01	; current level
 _BLOCKS:
 	DS	$01	; Number of blocks
 _X:	

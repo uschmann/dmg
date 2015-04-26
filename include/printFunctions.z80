@@ -29,6 +29,47 @@ coordsToAdress0:
 	ret
 
 ; **
+; Converts the given coordinates to the coressponding
+; BgMapAddress for BgMap1
+; --
+; Input:	a = y; b = x;
+; Output:	hl = address
+; **
+coordsToAdress1:
+	push	af
+	push	de
+
+	ld	d,0
+	ld	e,SCRN_VX_B
+	call	DE_Times_A		; _Y * Screen width
+	ld	de,_SCRN1
+	add	hl,de
+
+	ld	a,b			; Add x
+	ld	d,0
+	ld	e,a
+	add	hl,de
+
+	pop	de
+	pop	af
+	ret
+
+; **
+; Prints a 0 terminated string at the given coordinates
+; Input:	a = y; b = x; de = Address of String
+printText:
+	call	coordsToAdress0
+.loop
+	ld	a,[de]
+	and	a
+	ret	z
+	ld	[hl],a
+	inc	hl
+	inc	de
+	jr	.loop
+	ret
+
+; **
 ; Sets the OAM memory to 0
 ; **
 clearOamMemory:
@@ -62,17 +103,27 @@ clearScreen:
 	ret
 
 ; **
+; Fills one row with the given tile
+; Input: a = y; c = tilenumber
+; **
+fillRow:
+	ld	b,0
+	call	coordsToAdress0
+	ld	d,SCRN_VX_B
+.loop
+	ld	[hl],c
+	inc	hl
+	dec	d
+	jr	nz,.loop
+	ret
+
+; **
 ; Prints the lower 4 bit of c in ASCII at position x
 ; c = number
-; d = x
+; hl = address to print
 ; **
 printHex4:
 	push	de			; Save register pair de
-
-	ld	hl, _SCRN0		; Base BgMap0-Adress
-	ld	a,l			; Increase hl by d
-	add	d			;
-	ld	l,a			;
 
 	ld	de,HexDigits	; Base address of array of Digits
 	ld	a,e			; Increase de by value stored in c
@@ -87,14 +138,14 @@ printHex4:
 
 ; **
 ; Print value of c as HEX string
-; c = number
-; d = x
+; Input: a = y; b = x; c =number
 ; **
 printHex:
-	call	waitForVblank
 	push 	bc
 	push	de
 	push	af
+
+	call	coordsToAdress0
 
 	push	bc
 	ld	a,c			; get high nibble
@@ -106,14 +157,15 @@ printHex:
 	call	printHex4		; print low nibble
 	pop	bc
 
-	inc	d			; increase d to print the next nibble at position d+1
+	inc	hl			; increase d to print the next nibble at position d+1
 
 	ld	a,c			; get low nibble
 	and	$0F
 	ld	c,a
+	pop	af
 	call	printHex4		; print low nibble
 
-	pop	af
+	
 	pop	de
 	pop	bc
 
