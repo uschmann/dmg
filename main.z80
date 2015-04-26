@@ -52,6 +52,11 @@ begin:
 	di
 	ld	sp, $ffff		; set the stack pointer to highest mem location + 1
 init:
+	ld	a,0			; reset _PAD_DOWN
+	ld	[_PAD],a
+	ld	[_PAD_DOWN],a
+	ld	[_PAD_OLD],a
+
 	ld	a, %11100100 	; Window palette colors, from darkest to lightest
 	ld	[rBGP], a		; CLEAR THE SCREEN
 
@@ -81,6 +86,10 @@ init:
 SECTION	"global", BSS
 _PAD:			; allocate 1 byte for the state of the pad
 	DS	$01	
+_PAD_OLD:		; newly pressed buttons
+	DS	$01	
+_PAD_DOWN:
+	DS	$01
 _LIFES:		; Number of lifes left
 	DS	$01	
 _BLOCKS:

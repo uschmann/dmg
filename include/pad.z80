@@ -2,6 +2,9 @@
 ; Reads the status of the buttons and stores it in a variable at label _PAD
 ;****
 readPad:
+    ld  a,[_PAD]
+    ld  [_PAD_OLD],a
+
     ; init
     ld      a, 0
     ld      [_PAD], a
@@ -47,5 +50,15 @@ readPad:
     ld      a,$30
     ld      [rP1], a
 
-    ; return
+    ld  a,[_PAD_OLD]
+    ld  b,a
+
+    ld  a,[_PAD]
+    xor b
+
+    ld  b,a
+    ld  a,[_PAD]
+    and b
+    ld  [_PAD_DOWN],a
+
     ret

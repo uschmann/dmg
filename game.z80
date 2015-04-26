@@ -67,7 +67,7 @@ readInput:
 gameLogic:
 	call	checkCollision
 	call	moveBlocks
-	ld	a,[_PAD]		; if(_PAD != 0) setBlocks()
+	ld	a,[_PAD_DOWN]		; if(_PAD != 0) setBlocks()
 	cp	0
 	call	nz,setBlocks
 	ret
