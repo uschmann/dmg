@@ -3,6 +3,32 @@ HexDigits:
 	DB	$30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $41, $42, $43, $44, $45, $46
 
 ; **
+; Converts the given coordinates to the coressponding
+; BgMapAddress for BgMap0
+; --
+; Input:	a = y; b = x;
+; Output:	hl = address
+; **
+coordToAddress0:
+	push	af
+	push	de
+	
+	ld	d,0
+	ld	e,SCRN_VX_B
+	call	DE_Times_A		; _Y * Screen width
+	ld	de,_SCRN0
+	add	hl,de
+
+	ld	a,b			; Add x
+	ld	d,0
+	ld	e,a
+	add	hl,de
+
+	pop	de
+	pop	af
+	ret
+
+; **
 ; Sets the OAM memory to 0
 ; **
 clearOamMemory:

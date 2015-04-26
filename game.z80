@@ -72,20 +72,26 @@ gameLogic:
 ; **
 setBlocks:
 	ld	a,[_Y]
-	dec	a
+	cp	DEFAULT_Y		; Check if we are at the bottom
+	jr	nz,.notOnFirstLine
+	dec	a			; go to next line
 	ld	[_Y],a
+	ret
+.notOnFirstLine:
 	call	checkForFail
+
 	ret
 
 ; **
 ; Check if the user failed at placing the blocks
 ; OUTPUT: a ==1 if fail else a == 0
+; **
 checkForFail:
-
+	
 	ret
 
 ; **
-; Checks if collision with boarders of game filed accoured and flips the moving direction accordingly
+; Checks if collision with borders of game field accoured and flips the moving direction accordingly
 ; **
 checkCollision:
 	ld	a,[_DIRECTION]
@@ -154,7 +160,7 @@ drawBlocks:
 	dec	b
 	jr	nz,.clearLine
 
-	ld	a,[_Y]		; calculate start Address
+	ld	a,[_Y]		; calculate start Address -> _X + (_Y * screenWidth)
 	ld	d,0
 	ld	e,SCRN_VX_B
 	call	DE_Times_A		; _Y * Screen width
