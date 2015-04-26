@@ -149,3 +149,16 @@ stopLCD:
       ld      [rLCDC],a
 
       ret
+
+; **
+; Waits the given number of times for vblank
+; --
+; Input: b = times to wait
+; Output: b = 0
+; **
+simpleDelay:
+.loop:
+	call	waitForVblank
+	dec	b
+	jr	nz,.loop
+	ret

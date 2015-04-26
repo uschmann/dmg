@@ -8,7 +8,8 @@ DEFAULT_BLOCKS	EQU	4	; Number of blocks to start with
 DIR_LEFT		EQU	0 	; Constant for left direction 
 DIR_RIGHT		EQU	1 	; Constant for right direction 
 BOARD_WIDTH		EQU	15	; Width of the game field
-GOAL_Y		EQU	7	; The level is finished if y is == GOAL_Y
+GOAL_Y		EQU	10	; The level is finished if y is == GOAL_Y
+SPEED_INC		EQU	40	; The incresement of speed for each level
 
 ; constant data
 TXT_LIFES
@@ -50,9 +51,9 @@ initGame:
 ; The main game loop
 ; **
 gameLoop:
+	call	drawView		; draw the game screen
 	call 	readInput		; read Input
 	call	gameLogic		; game logic is here
-	call	drawView		; draw the game screen
 	jr	gameLoop
 
 ; **
@@ -66,16 +67,33 @@ readInput:
 ; Updates model value and sets the state of the game
 ; **
 gameLogic:
-	call	checkCollision
-	call	moveBlocks
 	ld	a,[_PAD_DOWN]		; if(_PAD != 0) setBlocks()
 	ld	b,KEY_A
 	and	b
 	cp	0
 	call	nz,setBlocks
 
+	call	checkCollision
+	call	moveBlocks
 	call	checkGameOver
+	call	checkWin
 	ret
+
+; **
+; Check if the player solved the level
+; **
+checkWin:
+	ld	a,[_Y]
+	cp	GOAL_Y
+	jr	z,.win
+	ret
+.win:
+	ld	a,[_SPEED]		; increase speed
+	add	SPEED_INC
+	ld	[_SPEED],a
+	call	resetLevel
+	ret
+
 
 ; **
 ; Checks if the game is over (_LIFES == 0)
@@ -145,9 +163,6 @@ resetLevel:
 	ld	a,DEFAULT_Y		; set the start y position
 	ld	[_Y],a		
 
-	ld	a,DEFAULT_SPEED	; set the speed
-	ld	[_SPEED],a
-
 	ld	a,DIR_RIGHT		; Set the moving direction
 	ld	[_DIRECTION],a
 
@@ -160,15 +175,15 @@ resetLevel:
 ; OUTPUT: a == 0 if fail else a == 1
 ; **
 checkForFail:
-	call	waitForVblank
 	ld	a,[_BLOCKS]
 	ld	c,a
-.forEachBlock:			; Check to see if each block is stacked on another
 	ld	a,[_X+1]		
 	ld	b,a
+.forEachBlock:			; Check to see if each block is stacked on another
 	ld	a,[_Y]
 	inc	a
 	call	coordsToAdress0
+	call	waitForVblank
 	ld	a,[hl]
 
 	cp	1			; Check if there is a block
@@ -302,7 +317,7 @@ drawNumberOfLifes:
 
 	ret
 
-;**
+; **
 ; Inverts the background color palette
 ; **
 flipBgPallete:
@@ -311,9 +326,4 @@ flipBgPallete:
 	ld	[rBGP], a	
 	ret
 
-simpleDelay:
-.loop:
-	call	waitForVblank
-	dec	b
-	jr	nz,.loop
-	ret
+
