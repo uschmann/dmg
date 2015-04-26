@@ -86,8 +86,10 @@ _LIFES:		; Number of lifes left
 _BLOCKS:
 	DS	$01	; Number of blocks
 _X:	
-	DS	$01	; Current x position
+	DS	$02	; Current x position
 _Y:
 	DS	$01	; Current y poition
+_SPEED:
+	DS	$01	; current speed of the blocks
 _DIRECTION:
 	DS	$01	; Current direction 0 = left 1 = right
